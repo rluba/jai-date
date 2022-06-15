@@ -41,11 +41,11 @@ add :: (date: *Date, amount: int, unit := Date_Part.DAY) {
 
 
 get_current_date :: () -> Date {
-	time := filetime_to_local_time(get_current_file_time());
+	time := to_calendar(current_time_consensus());
 	date: Date;
 	date.year = cast(s16) time.year;
 	date.month = time.month_starting_at_0 + 1;
-	date.day = time.day_starting_at_0 + 1;
+	date.day = time.day_of_month_starting_at_0 + 1;
 	return date;
 }
 
@@ -182,5 +182,4 @@ formatInt2 :: #bake_arguments formatInt(minimum_digits = 2);
 
 #import "Basic";
 #import "uniform";
-#import "Time";
 
