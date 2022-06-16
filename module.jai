@@ -41,11 +41,38 @@ add :: (date: *Date, amount: int, unit := Date_Part.DAY) {
 
 
 get_current_date :: () -> Date {
-	time := to_calendar(current_time_consensus());
+	cal := to_calendar(current_time_consensus());
 	date: Date;
-	date.year = cast(s16) time.year;
-	date.month = time.month_starting_at_0 + 1;
-	date.day = time.day_of_month_starting_at_0 + 1;
+	date.year = cast(s16) cal.year;
+	date.month = cal.month_starting_at_0 + 1;
+	date.day = cal.day_of_month_starting_at_0 + 1;
+	return date;
+}
+
+to_apollo_time :: (date: Date) -> Apollo_Time {
+	cal: Calendar_Time;
+	cal.year = date.year;
+	cal.month_starting_at_0 = date.month - 1;
+	cal.day_of_month_starting_at_0 = date.day - 1;
+	return calendar_to_apollo(cal);
+}
+
+date_from_unix_timestamp :: (timestamp: s64, time_zone := Time_Zone.UTC) -> Date {
+	timestamp_copy := timestamp; // Because we have to pass a pointer below…
+	tmp: tm;
+	if time_zone == .LOCAL {
+		tmp = localtime_r(*timestamp_copy, *tmp);
+	} else {
+		tmp = gmtime_r(*timestamp_copy, *tmp);
+	}
+
+	date: Date;
+	date.year = cast(s16) tmp.tm_year + 1900;
+	date.month = cast(s8) tmp.tm_mon + 1;
+	date.day = cast(s8) tmp.tm_mday;
+
+	assert(is_normalized(date));
+
 	return date;
 }
 
@@ -182,4 +209,7 @@ formatInt2 :: #bake_arguments formatInt(minimum_digits = 2);
 
 #import "Basic";
 #import "uniform";
+#if OS != .WINDOWS {
+	#import "POSIX";
+}
 
