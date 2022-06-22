@@ -158,6 +158,28 @@ is_normalized :: (date: $T/Polymorphic_Date) -> bool {
 #assert(!is_normalized(Date.{2000,12,0}));
 #assert(!is_normalized(Date.{2000,0,1}));
 
+
+is_leap_year :: (year: int) -> bool {
+    if year % 4        return false;
+
+    if (year % 100) == 0 && (year % 400)    return false;
+
+    return true;
+}
+
+#assert(is_leap_year(2000));
+#assert(!is_leap_year(2003));
+#assert(is_leap_year(2004));
+#assert(!is_leap_year(1999));
+#assert(!is_leap_year(1900));
+#assert(!is_leap_year(2100));
+
+compare :: (a: Date, b: Date) -> int {
+	if a.year != b.year		then return a.year - b.year;
+	if a.month != b.month	then return a.month - b.month;
+	return a.day - b.day;
+}
+
 #scope_file
 
 normalize_month :: (date: *$T/Polymorphic_Date) {
@@ -186,21 +208,6 @@ get_days_in_month :: (date: $T/Polymorphic_Date) -> int {
             return 31;
     }
 }
-
-is_leap_year :: (year: int) -> bool {
-    if year % 4        return false;
-
-    if (year % 100) == 0 && (year % 400)    return false;
-
-    return true;
-}
-
-#assert(is_leap_year(2000));
-#assert(!is_leap_year(2003));
-#assert(is_leap_year(2004));
-#assert(!is_leap_year(1999));
-#assert(!is_leap_year(1900));
-#assert(!is_leap_year(2100));
 
 iso_date_expr: Regexp;
 de_date_expr: Regexp;
