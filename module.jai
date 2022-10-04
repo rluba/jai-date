@@ -27,9 +27,9 @@ add :: (date: *Date, amount: int, unit := Date_Part.DAY) {
     big_date.day = date.day;
 
     if #complete unit == {
-        case .DAY;        big_date.day += amount;
+        case .DAY;      big_date.day   += amount;
         case .MONTH;    big_date.month += amount;
-        case .YEAR;        big_date.year += cast(s16) amount;
+        case .YEAR;     big_date.year  += cast(s16) amount;
     }
 
     normalize_date(*big_date);
