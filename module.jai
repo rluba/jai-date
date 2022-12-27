@@ -26,11 +26,19 @@ add :: (date: *Date, amount: int, unit := Date_Part.DAY) {
     big_date.month = date.month;
     big_date.day = date.day;
 
+    normalize_date(*big_date);
+
     if #complete unit == {
         case .DAY;      big_date.day   += amount;
         case .MONTH;    big_date.month += amount;
         case .YEAR;     big_date.year  += cast(s16) amount;
     }
+
+	if unit != .DAY {
+		normalize_month(*big_date);
+		last_day := get_days_in_month(*big_date);
+		if big_date.day > last_day	big_date.day = last_day;
+	}
 
     normalize_date(*big_date);
 
@@ -39,6 +47,35 @@ add :: (date: *Date, amount: int, unit := Date_Part.DAY) {
     date.day = cast(s8) big_date.day;
 }
 
+#run {
+	{
+		date := parse_date("2022-10-31");
+		add(*date, 1, .MONTH);
+		result := string_from_date(date);
+		assert(result == "2022-11-30", "Unexpected result after adding 1 month: %", result);
+	}
+	{
+		date := parse_date("2022-01-30");
+		add(*date, 1, .MONTH);
+		result := string_from_date(date);
+		assert(result == "2022-02-28", "Unexpected result after adding 1 month: %", result);
+	}
+}
+
+
+
+end_of :: (date: *Date, unit: Date_Part) {
+    if #complete unit == {
+        case .DAY; // Makes no sense, but we allow it
+		case .MONTH;
+			normalize_month(date);
+			date.day = get_days_in_month(<<date);
+        case .YEAR;
+			normalize_month(date);
+			date.month = 12;
+			date.day = get_days_in_month(<<date);
+    }
+}
 
 get_current_date :: () -> Date {
 	cal := to_calendar(current_time_consensus());
@@ -194,7 +231,7 @@ normalize_month :: (date: *$T/Polymorphic_Date) {
 }
 
 // Date must already be normalized!
-get_days_in_month :: (date: $T/Polymorphic_Date) -> int {
+get_days_in_month :: (date: $T/Polymorphic_Date) -> s8 {
     if date.month == {
         case 2;
             if is_leap_year(date.year)    return 29;
