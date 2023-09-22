@@ -148,8 +148,7 @@ parse_date :: (str: string, format := Date_Format.ISO) -> Date, bool {
 
 string_from_date :: (date: Date, format := Date_Format.ISO, allocator := context.allocator) -> string {
     builder: String_Builder;
-	builder.allocator = allocator; // @ToDo: Maybe use temp?
-    defer free_buffers(*builder);
+	builder.allocator = temp;
     append_date(*builder, date, format);
     return builder_to_string(*builder, allocator);
 }
