@@ -150,7 +150,7 @@ string_from_date :: (date: Date, format := Date_Format.ISO, allocator := context
     builder: String_Builder;
 	builder.allocator = temp;
     append_date(*builder, date, format);
-    return builder_to_string(*builder, allocator);
+    return builder_to_string(*builder,, allocator);
 }
 
 append_date :: (builder: *String_Builder, date: Date, format := Date_Format.ISO) {
