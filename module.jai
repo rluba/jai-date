@@ -146,11 +146,11 @@ parse_date :: (str: string, format := Date_Format.ISO) -> Date, bool {
     return result, is_normalized(result);
 }
 
-string_from_date :: (date: Date, format := Date_Format.ISO, allocator := context.allocator) -> string {
+string_from_date :: (date: Date, format := Date_Format.ISO) -> string {
     builder: String_Builder;
-	builder.allocator = temp;
+    defer free_buffers(*builder);
     append_date(*builder, date, format);
-    return builder_to_string(*builder,, allocator);
+    return builder_to_string(*builder);
 }
 
 append_date :: (builder: *String_Builder, date: Date, format := Date_Format.ISO) {
